@@ -44,6 +44,13 @@ function button(text, onClick, variant) {
   return btn;
 }
 
+function formatTime(seconds) {
+  const wholeSeconds = Math.max(Math.floor(seconds), 0);
+  const minutes = Math.floor(wholeSeconds / 60);
+  const remainder = wholeSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
+}
+
 /* -------------------------------- generator ------------------------------- */
 
 function renderGenerator() {
@@ -268,10 +275,14 @@ function renderPlayer(exStr, bpmParam) {
   const progressFill = el('div', 'progress-fill', []);
   const progressBar = el('div', 'progress-bar', [progressFill]);
 
-  const startBtn = button('Start', start, 'primary');
-  app.append(circleWrap, roundLabel, progressBar, el('div', 'controls', [startBtn]));
-
   const totalSeconds = timeline.reduce((sum, p) => sum + p.seconds, 0);
+  const displayedTotalSeconds = Math.ceil(totalSeconds);
+  const currentTimeEl = el('span', 'time-label', [document.createTextNode(formatTime(0))]);
+  const totalTimeEl = el('span', 'time-label', [document.createTextNode(formatTime(displayedTotalSeconds))]);
+  const progressRow = el('div', 'progress-row', [currentTimeEl, progressBar, totalTimeEl]);
+
+  const startBtn = button('Start', togglePlayback, 'primary');
+  app.append(circleWrap, roundLabel, progressRow, el('div', 'controls', [startBtn]));
 
   let audioCtx = null;
   let wakeLock = null;
@@ -281,13 +292,23 @@ function renderPlayer(exStr, bpmParam) {
   let pausedElapsedMs = 0; // ms into the current phase when paused
   let hasBegun = false;
   let running = false;
+  let finished = false;
   let rafId = null;
+
+  function togglePlayback() {
+    if (finished) {
+      location.reload();
+    } else if (running) {
+      pause();
+    } else {
+      start();
+    }
+  }
 
   async function start() {
     if (running) return;
     running = true;
     startBtn.textContent = 'Pause';
-    startBtn.onclick = pause;
 
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') await audioCtx.resume();
@@ -307,7 +328,6 @@ function renderPlayer(exStr, bpmParam) {
   function pause() {
     running = false;
     startBtn.textContent = 'Resume';
-    startBtn.onclick = start;
     releaseWakeLock();
     cancelAnimationFrame(rafId);
     pausedElapsedMs = performance.now() - phaseStartTime;
@@ -354,7 +374,9 @@ function renderPlayer(exStr, bpmParam) {
       countLabelEl.textContent = `${Math.max(Math.ceil(phase.seconds - elapsed), 0)}s`;
     }
 
-    progressFill.style.width = `${Math.min(((elapsedBefore + elapsed) / totalSeconds) * 100, 100)}%`;
+    const currentSeconds = Math.min(elapsedBefore + elapsed, totalSeconds);
+    progressFill.style.width = `${Math.min((currentSeconds / totalSeconds) * 100, 100)}%`;
+    currentTimeEl.textContent = formatTime(currentSeconds);
 
     if (frac >= 1) {
       elapsedBefore += phase.seconds;
@@ -372,14 +394,15 @@ function renderPlayer(exStr, bpmParam) {
 
   function finish() {
     running = false;
+    finished = true;
     releaseWakeLock();
     circleWrap.classList.remove('holding');
     phaseLabelEl.textContent = 'Done';
     countLabelEl.textContent = '';
     roundLabel.textContent = '';
     progressFill.style.width = '100%';
+    currentTimeEl.textContent = formatTime(displayedTotalSeconds);
     startBtn.textContent = 'Restart';
-    startBtn.onclick = () => location.reload();
   }
 
   function beep(phaseName) {

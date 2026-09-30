@@ -91,10 +91,12 @@ select {
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     transform: scale(0.55);
   }
+
   50% {
     transform: scale(0.62);
   }
@@ -135,9 +137,26 @@ select {
   min-height: 1.2em;
 }
 
+.progress-row {
+  display: grid;
+  grid-template-columns: 5ch minmax(0, 280px) 5ch;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.time-label {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-label:last-child {
+  text-align: right;
+}
+
 .progress-bar {
   width: 100%;
-  max-width: 280px;
   height: 4px;
   border-radius: 2px;
   background: var(--breath-bg);
