@@ -258,8 +258,14 @@ function renderPlayer(exStr, bpmParam) {
   const circleWrap = el('div', 'circle-wrap', []);
   circleWrap.innerHTML = `
     <svg viewBox="0 0 200 200" class="circle-svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="breath-gradient" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#58bdff"></stop>
+          <stop offset="100%" stop-color="#1674f5"></stop>
+        </linearGradient>
+      </defs>
       <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-      <circle class="circle-main" cx="100" cy="100" r="60"></circle>
+      <circle class="circle-main" cx="100" cy="100" r="90"></circle>
     </svg>
     <div class="circle-text">
       <div class="phase-label">Ready</div>
@@ -298,9 +304,12 @@ function renderPlayer(exStr, bpmParam) {
   let rafId = null;
 
   function setPlaybackButton(icon, label) {
-    startBtn.innerHTML = icon === 'play'
-      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.8v14.4L19 12 7 4.8Z"></path></svg>'
-      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>';
+    const icons = {
+      play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.8v14.4L19 12 7 4.8Z"></path></svg>',
+      pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>',
+      restart: '<svg class="restart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 2v6h6"></path><path d="M3 13a9 9 0 1 0 2.6-6.4L3 8"></path></svg>',
+    };
+    startBtn.innerHTML = icons[icon];
     startBtn.setAttribute('aria-label', label);
   }
 
@@ -411,9 +420,7 @@ function renderPlayer(exStr, bpmParam) {
     roundLabel.textContent = '';
     progressFill.style.width = '100%';
     currentTimeEl.textContent = formatTime(displayedTotalSeconds);
-    startBtn.classList.remove('btn-playback');
-    startBtn.removeAttribute('aria-label');
-    startBtn.textContent = 'Restart';
+    setPlaybackButton('restart', 'Restart');
   }
 
   function beep(phaseName) {
