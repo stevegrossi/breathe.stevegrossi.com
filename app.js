@@ -2,9 +2,26 @@ import { parseExercise, buildExercise, buildTimeline } from './notation.js';
 
 const app = document.getElementById('app');
 const params = new URLSearchParams(location.search);
-const exParam = params.get('ex');
+const fallbackExercise = params.get('_path');
+const appBasePath = location.pathname.endsWith('/')
+  ? location.pathname
+  : location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1);
+const pathExercise = location.pathname.endsWith('/')
+  ? ''
+  : decodeURIComponent(location.pathname.slice(appBasePath.length));
+const exParam = pathExercise && pathExercise !== 'index.html'
+  ? pathExercise
+  : fallbackExercise
+    ? decodeURIComponent(fallbackExercise)
+    : null;
 
 if (exParam) {
+  if (fallbackExercise) {
+    const cleanUrl = new URL(location.href);
+    cleanUrl.pathname = `${appBasePath}${encodeURIComponent(exParam)}`;
+    cleanUrl.searchParams.delete('_path');
+    history.replaceState(null, '', cleanUrl);
+  }
   renderPlayer(exParam, params.get('bpm'));
 } else {
   renderGenerator();
@@ -190,7 +207,10 @@ function renderGenerator() {
           const exStr = buildExercise(steps);
           const url = new URL(location.href);
           url.search = '';
-          url.searchParams.set('ex', exStr);
+          const basePath = location.pathname.endsWith('/')
+            ? location.pathname
+            : location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1);
+          url.pathname = `${basePath}${encodeURIComponent(exStr)}`;
           url.searchParams.set('bpm', bpmInput.value);
           const urlStr = url.toString();
 

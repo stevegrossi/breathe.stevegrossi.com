@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Loading exercise</title>
+</head>
+<body>
+  <script>
+    const lastSlash = location.pathname.lastIndexOf('/');
+    const basePath = location.pathname.slice(0, lastSlash + 1);
+    const exercisePath = location.pathname.slice(lastSlash + 1);
+    const target = new URL(basePath, location.origin);
+    target.search = location.search;
+    target.searchParams.set('_path', exercisePath);
+    location.replace(target);
+  </script>
+</body>
+</html>
