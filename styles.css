@@ -1,0 +1,279 @@
+:root {
+  --bg: #151a21;
+  --surface: #1c232c;
+  --text: #e6e9ee;
+  --text-muted: #8993a4;
+  --breath: #4f8a8b;
+  --breath-bg: #2a343f;
+  --hold: #e8b676;
+  --error: #e0776b;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 32px;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--breath);
+  outline-offset: 2px;
+}
+
+.error {
+  color: var(--error);
+}
+
+/* --------------------------------- player --------------------------------- */
+
+.view-player {
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.circle-wrap {
+  position: relative;
+  width: min(72vw, 280px);
+  aspect-ratio: 1;
+}
+
+.circle-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: var(--breath-bg);
+  stroke-width: 2;
+}
+
+.circle-main {
+  fill: var(--breath);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: fill 0.6s ease;
+}
+
+.circle-wrap.holding .circle-main {
+  fill: var(--hold);
+  animation: pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(0.55);
+  }
+  50% {
+    transform: scale(0.62);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circle-wrap.holding .circle-main {
+    animation: none;
+  }
+}
+
+.circle-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.phase-label {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.count-label {
+  margin-top: 4px;
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.round-label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  min-height: 1.2em;
+}
+
+.progress-bar {
+  width: 100%;
+  max-width: 280px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--breath-bg);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--breath);
+  transition: width 0.1s linear;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+}
+
+/* ------------------------------- generator -------------------------------- */
+
+.view-generator {
+  align-items: stretch;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  gap: 4px;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 8px 0 4px;
+}
+
+.hint {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 16px;
+  max-width: 46ch;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border-radius: var(--radius);
+}
+
+.row label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.field-label {
+  font-size: 0.8rem;
+}
+
+.row input[type="number"],
+.row select {
+  background: var(--bg);
+  border: 1px solid var(--breath-bg);
+  border-radius: 6px;
+  padding: 6px 8px;
+  width: 8ch;
+}
+
+.row select {
+  width: auto;
+}
+
+.custom-phase-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.add-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.row-bpm {
+  margin-bottom: 16px;
+}
+
+.result {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.link {
+  color: var(--breath);
+  word-break: break-all;
+  font-size: 0.9rem;
+}
+
+/* --------------------------------- buttons --------------------------------- */
+
+.btn {
+  background: var(--surface);
+  border: 1px solid var(--breath-bg);
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--breath);
+}
+
+.btn-primary {
+  background: var(--breath);
+  border-color: var(--breath);
+  color: #0e1216;
+  font-weight: 600;
+}
+
+.btn-remove {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  align-self: center;
+}
