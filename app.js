@@ -281,7 +281,9 @@ function renderPlayer(exStr, bpmParam) {
   const totalTimeEl = el('span', 'time-label', [document.createTextNode(formatTime(displayedTotalSeconds))]);
   const progressRow = el('div', 'progress-row', [currentTimeEl, progressBar, totalTimeEl]);
 
-  const startBtn = button('Start', togglePlayback, 'primary');
+  const startBtn = button('', togglePlayback, 'primary');
+  startBtn.classList.add('btn-playback');
+  setPlaybackButton('play', 'Start');
   app.append(circleWrap, roundLabel, progressRow, el('div', 'controls', [startBtn]));
 
   let audioCtx = null;
@@ -294,6 +296,13 @@ function renderPlayer(exStr, bpmParam) {
   let running = false;
   let finished = false;
   let rafId = null;
+
+  function setPlaybackButton(icon, label) {
+    startBtn.innerHTML = icon === 'play'
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.8v14.4L19 12 7 4.8Z"></path></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg>';
+    startBtn.setAttribute('aria-label', label);
+  }
 
   function togglePlayback() {
     if (finished) {
@@ -308,7 +317,7 @@ function renderPlayer(exStr, bpmParam) {
   async function start() {
     if (running) return;
     running = true;
-    startBtn.textContent = 'Pause';
+    setPlaybackButton('pause', 'Pause');
 
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') await audioCtx.resume();
@@ -327,7 +336,7 @@ function renderPlayer(exStr, bpmParam) {
 
   function pause() {
     running = false;
-    startBtn.textContent = 'Resume';
+    setPlaybackButton('play', 'Resume');
     releaseWakeLock();
     cancelAnimationFrame(rafId);
     pausedElapsedMs = performance.now() - phaseStartTime;
@@ -402,6 +411,8 @@ function renderPlayer(exStr, bpmParam) {
     roundLabel.textContent = '';
     progressFill.style.width = '100%';
     currentTimeEl.textContent = formatTime(displayedTotalSeconds);
+    startBtn.classList.remove('btn-playback');
+    startBtn.removeAttribute('aria-label');
     startBtn.textContent = 'Restart';
   }
 
